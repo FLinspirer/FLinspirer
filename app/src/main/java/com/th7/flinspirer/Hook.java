@@ -1,6 +1,9 @@
 package com.th7.flinspirer;
+import android.app.Application;
+import android.content.Context;
+import android.widget.Toast;
+
 import de.robv.android.xposed.*;
-import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import java.security.interfaces.DSAPublicKey;
 
@@ -8,15 +11,50 @@ public class Hook implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
         if (loadPackageParam.packageName.equals("com.android.launcher3")) {
-        
+            //wanpeng_5.02.004
+            Class AppInstrumentation = XposedHelpers.findClass("android.app.Instrumentation", null);
             Class DSAUtil = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.util.d");
-            Class b = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.dataclean.PullNewsActivity");
-            Class c = loadPackageParam.classLoader.loadClass("com.AliPushReceiver");
-            Class d = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.LTKTactics");
-            Class e = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.TacticsIllegal");
-            Class f = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.DeviceSetting");
-            Class g = loadPackageParam.classLoader.loadClass("com.drupe.swd.launcher.huoshan.utils.a");
-            
+            Class PullNewsActivity = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.dataclean.PullNewsActivity");
+            Class AliPushReceiver = loadPackageParam.classLoader.loadClass("com.AliPushReceiver");
+            Class LTKTactics = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.LTKTactics");
+            Class TacticsIllegal = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.TacticsIllegal");
+            Class DeviceSetting = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.DeviceSetting");
+            Class LogOutPassword = loadPackageParam.classLoader.loadClass("com.drupe.swd.launcher.huoshan.utils.a");
+            final Context[] context = {null};
+
+            XposedHelpers.findAndHookMethod(AppInstrumentation, "callApplicationOnCreate", Application.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                }
+
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    if(param.args[0] instanceof Application){
+                        context[0] = ((Application) param.args[0]).getApplicationContext();
+                    } else {
+                        return;
+                    }
+                    Toast.makeText(context[0], "FLinspirer: Got Context "+context[0].getPackageName(), Toast.LENGTH_LONG).show();
+                }
+            });
+
+            XposedBridge.hookAllMethods(android.app.AlertDialog.Builder.class, "setCancelable", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    param.args[0]=true;
+                }
+            });
+
+            XposedBridge.hookAllMethods(android.app.AlertDialog.Builder.class, "setFinishOnTouchOutside", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    param.args[0]=true;
+                }
+            });
+
+
             XposedHelpers.findAndHookMethod(DSAUtil, "a", DSAPublicKey.class,String.class,String.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -34,7 +72,7 @@ public class Hook implements IXposedHookLoadPackage {
             });
             
             
-            XposedHelpers.findAndHookMethod(b, "a", new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(PullNewsActivity, "a", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     param.setResult(false);
@@ -42,7 +80,7 @@ public class Hook implements IXposedHookLoadPackage {
                 }
             });
             
-            XposedHelpers.findAndHookMethod(b, "b", new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(PullNewsActivity, "b", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     param.setResult(false);
@@ -51,7 +89,7 @@ public class Hook implements IXposedHookLoadPackage {
             });
             
             
-            XposedHelpers.findAndHookMethod(c, "a",String.class, new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(AliPushReceiver, "a",String.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 param.args[0] = "";
@@ -59,7 +97,7 @@ public class Hook implements IXposedHookLoadPackage {
                 }
             });  
                
-            XposedHelpers.findAndHookMethod(c, "a",String.class,int.class, new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(AliPushReceiver, "a",String.class,int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 param.args[0] = "";
@@ -69,7 +107,7 @@ public class Hook implements IXposedHookLoadPackage {
             
             
             
-            XposedHelpers.findAndHookMethod(d, "isIllegal_status", new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(LTKTactics, "isIllegal_status", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     boolean res = (boolean) param.getResult();
@@ -80,17 +118,17 @@ public class Hook implements IXposedHookLoadPackage {
                 }
             });
             
-            XposedHelpers.findAndHookMethod(d, "setIllegal_status", boolean.class, new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(LTKTactics, "setIllegal_status", boolean.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     boolean s1 = (boolean) param.args[0];
                     if(s1){
                     param.args[0] = false;
-                    XposedBridge.log("FLinspirer: Set Illegal Status Fucked ");
+                    XposedBridge.log("FLinspirer: Set Illegal Status Fucked.");
                     } 
                 }
                }); 
-                XposedHelpers.findAndHookMethod(d, "isWorkspace_status", new XC_MethodHook() {
+                XposedHelpers.findAndHookMethod(LTKTactics, "isWorkspace_status", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     boolean res = (boolean) param.getResult();
@@ -101,7 +139,7 @@ public class Hook implements IXposedHookLoadPackage {
                 }
             });
             
-            XposedHelpers.findAndHookMethod(d, "setWorkspace_status", boolean.class, new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(LTKTactics, "setWorkspace_status", boolean.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     boolean s1 = (boolean) param.args[0];
@@ -114,7 +152,7 @@ public class Hook implements IXposedHookLoadPackage {
              
             
             
-            XposedHelpers.findAndHookMethod(e, "getAlready_root", new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(TacticsIllegal, "getAlready_root", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     param.setResult(null);
@@ -122,7 +160,7 @@ public class Hook implements IXposedHookLoadPackage {
                     }
             });
 
-            XposedHelpers.findAndHookMethod(e, "getUsb_to_pc", new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(TacticsIllegal, "getUsb_to_pc", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     param.setResult(null);
@@ -132,18 +170,18 @@ public class Hook implements IXposedHookLoadPackage {
             
             
             
-            XposedHelpers.findAndHookMethod(f, "setGallery_status", int.class, new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(DeviceSetting, "setGallery_status", int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     int s1 = (int) param.args[0];
                     if(s1==1){
                     param.args[0] = 0;
-                    XposedBridge.log("FLinspirer: Hide Gallery Fucked ");
+                    XposedBridge.log("FLinspirer: Hide Gallery Fucked.");
                     } 
                 }
              });
              
-             XposedHelpers.findAndHookMethod(f, "getGallery_status", new XC_MethodHook() {
+             XposedHelpers.findAndHookMethod(DeviceSetting, "getGallery_status", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     int res = (int) param.getResult();
@@ -154,18 +192,18 @@ public class Hook implements IXposedHookLoadPackage {
                 }
             });
             
-             XposedHelpers.findAndHookMethod(f, "setCamera_status", int.class, new XC_MethodHook() {
+             XposedHelpers.findAndHookMethod(DeviceSetting, "setCamera_status", int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     int s1 = (int) param.args[0];
                     if(s1==1){
                     param.args[0] = 0;
-                    XposedBridge.log("FLinspirer: Hide Camera Fucked ");
+                    XposedBridge.log("FLinspirer: Hide Camera Fucked.");
                     } 
                 }
              });
              
-             XposedHelpers.findAndHookMethod(f, "getCamera_status", new XC_MethodHook() {
+             XposedHelpers.findAndHookMethod(DeviceSetting, "getCamera_status", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     int res = (int) param.getResult();
@@ -177,41 +215,40 @@ public class Hook implements IXposedHookLoadPackage {
                 
             });
             
-             XposedHelpers.findAndHookMethod(f, "setCalendar_status", int.class, new XC_MethodHook() {
+             XposedHelpers.findAndHookMethod(DeviceSetting, "setCalendar_status", int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     int s1 = (int) param.args[0];
                     if(s1==1){
                     param.args[0] = 0;
-                    XposedBridge.log("FLinspirer: Hide Calendar Fucked ");
+                    XposedBridge.log("FLinspirer: Hide Calendar Fucked.");
                     } 
                 }
              });
              
-             XposedHelpers.findAndHookMethod(f, "getCalendar_status", new XC_MethodHook() {
+             XposedHelpers.findAndHookMethod(DeviceSetting, "getCalendar_status", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     int res = (int) param.getResult();
-                    if(res==1){
-                    param.setResult(0);
-                    XposedBridge.log("FLinspirer: Get Show Calendar Fucked.");
+                    if (res == 1) {
+                        param.setResult(0);
+                        XposedBridge.log("FLinspirer: Get Show Calendar Fucked.");
                     }
-                    }
-                
+                }
             });
             
-             XposedHelpers.findAndHookMethod(f, "setAlarm_clock_status", int.class, new XC_MethodHook() {
+             XposedHelpers.findAndHookMethod(DeviceSetting, "setAlarm_clock_status", int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     int s1 = (int) param.args[0];
                     if(s1==1){
                     param.args[0] = 0;
-                    XposedBridge.log("FLinspirer: Hide Clock Fucked ");
+                    XposedBridge.log("FLinspirer: Hide Clock Fucked.");
                     } 
                 }
              });
             
-            XposedHelpers.findAndHookMethod(f, "getAlarm_clock_status", new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(DeviceSetting, "getAlarm_clock_status", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     int res = (int) param.getResult();
@@ -222,7 +259,7 @@ public class Hook implements IXposedHookLoadPackage {
                 }
             });
             
-            XposedHelpers.findAndHookMethod(g, "a", String.class, new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(LogOutPassword, "a", String.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     String s = (String) param.args[0];
@@ -235,8 +272,7 @@ public class Hook implements IXposedHookLoadPackage {
                     XposedBridge.log("FLinspirer: Login Out Password Fucked.");
                 }
              });
-             
-             
+
         }
     }
 }

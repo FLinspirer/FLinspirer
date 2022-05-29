@@ -26,6 +26,7 @@ android {
 }
 
 dependencies {
-	// CodeAssist does NOT support adding dependencies here,
+    compileOnly files('libs/XposedBridgeApi-82.jar')
+    // CodeAssist does NOT support adding dependencies here,
 	// try using the library manager instead
 }
