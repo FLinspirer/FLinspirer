@@ -8,11 +8,14 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import java.security.interfaces.DSAPublicKey;
 
 public class Hook implements IXposedHookLoadPackage {
+    public final Context[] context = {null,null};
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+    Class AppInstrumentation = XposedHelpers.findClass("android.app.Instrumentation", null);
+    
         if (loadPackageParam.packageName.equals("com.android.launcher3")) {
+        String NickName="";
             //wanpeng_5.02.004
-            Class AppInstrumentation = XposedHelpers.findClass("android.app.Instrumentation", null);
             Class DSAUtil = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.util.d");
             Class PullNewsActivity = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.dataclean.PullNewsActivity");
             Class AliPushReceiver = loadPackageParam.classLoader.loadClass("com.AliPushReceiver");
@@ -20,8 +23,9 @@ public class Hook implements IXposedHookLoadPackage {
             Class TacticsIllegal = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.TacticsIllegal");
             Class DeviceSetting = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.DeviceSetting");
             Class LogOutPassword = loadPackageParam.classLoader.loadClass("com.drupe.swd.launcher.huoshan.utils.a");
-            final Context[] context = {null};
-
+            Class DataCleanActivity = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.dataclean.DataCleanActivity");
+            Class UserInfoUtil = loadPackageParam.classLoader.loadClass("com.android.launcher3.a.l");
+            
             XposedHelpers.findAndHookMethod(AppInstrumentation, "callApplicationOnCreate", Application.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -39,13 +43,28 @@ public class Hook implements IXposedHookLoadPackage {
                     Toast.makeText(context[0], "FLinspirer: Got Context "+context[0].getPackageName(), Toast.LENGTH_LONG).show();
                 }
             });
-
-            XposedBridge.hookAllMethods(android.app.AlertDialog.Builder.class, "setCancelable", new XC_MethodHook() {
+            
+            XposedBridge.hookAllMethods(UserInfoUtil, "setFinishOnTouchOutside", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     param.args[0]=true;
                 }
             });
+            /*
+            XposedHelpers.findAndHookMethod(UserInfoUtil, "q", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(NickName);
+                }
+                });
+                
+            XposedHelpers.findAndHookMethod(UserInfoUtil, "g",String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    param.args[0]=NickName;
+                }
+            });
+            */
 
             XposedBridge.hookAllMethods(android.app.AlertDialog.Builder.class, "setFinishOnTouchOutside", new XC_MethodHook() {
                 @Override
@@ -272,7 +291,173 @@ public class Hook implements IXposedHookLoadPackage {
                     XposedBridge.log("FLinspirer: Login Out Password Fucked.");
                 }
              });
+             
+             //5.0.304
+             Class DynamicOrStaticPWUtil = loadPackageParam.classLoader.loadClass("com.drupe.swd.launcher.huoshan.utils.d");
+             Class LoginActivity = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.LoginActivity");
+             
+             XposedHelpers.findAndHookMethod(LoginActivity, "c", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    boolean s1 = (boolean) param.getResult();
+                    if(!s1){
+                    param.setResult(true);
+                    XposedBridge.log("FLinspirer: Admin Password Wrong Count Fucked.");
+                    } 
+                }
+             });
+             
+             XposedHelpers.findAndHookMethod(LoginActivity, "a",String.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    boolean s1 = (boolean) param.getResult();
+                    if(!s1){
+                    param.setResult(true);
+                    XposedBridge.log("FLinspirer: Admin Password Fucked.");
+                    } 
+                }
+             });
+             
+             XposedHelpers.findAndHookMethod(DynamicOrStaticPWUtil, "a", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    String s1 = (String) param.getResult();
+                    XposedBridge.log("FLinspirer: Admin Password "+s1);
+                    }
+             });
+             
+             XposedHelpers.findAndHookMethod(DynamicOrStaticPWUtil, "c", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    String s1 = (String) param.getResult();
+                    XposedBridge.log("FLinspirer: Dynamic Password "+s1);
+                    }
+             });
+             
+             
+        }
+        
+        if (loadPackageParam.packageName.equals("com.ndwill.swd.appstore")) {
+        
+            Class AppItem = loadPackageParam.classLoader.loadClass("com.ndwill.swd.appstore.info.AppItem");
+            Class DownloadCountUtil = loadPackageParam.classLoader.loadClass("com.ndwill.swd.appstore.a.b");
+            Class LTKApkUtil = loadPackageParam.classLoader.loadClass("com.linspirer.utils.c");
+            
+        XposedHelpers.findAndHookMethod(AppInstrumentation, "callApplicationOnCreate", Application.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                }
 
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    if(param.args[0] instanceof Application){
+                        context[1] = ((Application) param.args[0]).getApplicationContext();
+                    } else {
+                        return;
+                    }
+                    Toast.makeText(context[1], "FLinspirer: Got Context "+context[1].getPackageName(), Toast.LENGTH_LONG).show();
+                }
+            });
+            
+            XposedHelpers.findAndHookMethod(AppItem, "isIsforce", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    boolean res = (boolean) param.getResult();
+                    if(res){
+                    param.setResult(false);
+                    XposedBridge.log("FLinspirer: Get App Force Install Fucked.");
+                    }
+                }
+            });
+            
+            XposedHelpers.findAndHookMethod(AppItem, "setIsforce", boolean.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    boolean s1 = (boolean) param.args[0];
+                    if(s1){
+                    param.args[0] = false;
+                    XposedBridge.log("FLinspirer: Set App Force Install Fucked ");
+                    } 
+                }
+             });
+             
+             XposedHelpers.findAndHookMethod(AppItem, "isCanuninstall", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    boolean res = (boolean) param.getResult();
+                    if(!res){
+                    param.setResult(true);
+                    XposedBridge.log("FLinspirer: Get App Can't Uninstall Fucked.");
+                    }
+                }
+            });
+            
+            XposedHelpers.findAndHookMethod(AppItem, "setCanuninstall", boolean.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    boolean s1 = (boolean) param.args[0];
+                    if(!s1){
+                    param.args[0] = true;
+                    XposedBridge.log("FLinspirer: Set App Can't Uninstall Fucked ");
+                    } 
+                }
+             });
+             
+             XposedHelpers.findAndHookMethod(AppItem, "getException_white_url", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    int res = (int) param.getResult();
+                    if (res == 0) {
+                        param.setResult(1);
+                        XposedBridge.log("FLinspirer: Get App White Url Fucked.");
+                    }
+                }
+            });
+            
+             XposedHelpers.findAndHookMethod(AppItem, "setException_white_url", int.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    int s1 = (int) param.args[0];
+                    if(s1==0){
+                    param.args[0] = 1;
+                    XposedBridge.log("FLinspirer: Set App White Url Fucked.");
+                    } 
+                }
+             });
+             
+             /*
+             XposedHelpers.findAndHookMethod(AppItem, "getDownloadcount", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    int res = (int) param.getResult();
+                    String s = String.valueOf(res);
+                    Toast.makeText(context[1], "FLinspirer: Downloaded Count is "+s, Toast.LENGTH_LONG).show();
+                }
+            });
+            */
+            
+            XposedHelpers.findAndHookMethod(DownloadCountUtil, "a", int.class,Context.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    int s1 = (int) param.args[0];
+                    String s = String.valueOf(s1);
+                    param.setResult(s);
+                }
+             });
+              
+              XposedHelpers.findAndHookMethod(LTKApkUtil, "a",String.class, String.class, new XC_MethodHook() {
+				  @Override
+				  protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+					  boolean res = (boolean) param.getResult();
+					  if(!res){
+						  param.setResult(true);
+						  XposedBridge.log("FLinspirer: Apk Verfiy Fucked.");
+					  }
+				  }
+			  });
+            
         }
     }
 }
