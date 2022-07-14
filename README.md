@@ -33,3 +33,7 @@
 `显示应用“真实”下载次数`
 
 `取消apk校验`
+
+`领创log写入文件（日志在/sdcard/FLinspirer/Linspirer_log/下 第二天会删除之前的文件）`
+
+`command过滤恢复出厂 重启 上报位置等`

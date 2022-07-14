@@ -3,8 +3,12 @@ import android.app.Application;
 import android.content.Context;
 import android.widget.Toast;
 
-import de.robv.android.xposed.*;
+import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+
 import java.security.interfaces.DSAPublicKey;
 
 public class Hook implements IXposedHookLoadPackage {
@@ -25,6 +29,66 @@ public class Hook implements IXposedHookLoadPackage {
             Class LogOutPassword = loadPackageParam.classLoader.loadClass("com.drupe.swd.launcher.huoshan.utils.a");
             Class DataCleanActivity = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.dataclean.DataCleanActivity");
             Class UserInfoUtil = loadPackageParam.classLoader.loadClass("com.android.launcher3.a.l");
+            Class CmdManager = loadPackageParam.classLoader.loadClass("com.drupe.swd.launcher.huoshan.mdm.tool.a");
+            Class LTKLog = loadPackageParam.classLoader.loadClass("com.linspirer.utils.d.f");
+            
+            //log写入文件
+            XposedHelpers.findAndHookMethod(LTKLog, "a",String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                Log2File.Log("d "+param.args[0]);
+                }
+            });  
+            
+            XposedHelpers.findAndHookMethod(LTKLog, "a",String.class,String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log2File.Log("d "+param.args[0]+" "+param.args[1]);
+                }
+            });  
+            
+            XposedHelpers.findAndHookMethod(LTKLog, "b",String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log2File.Log("i "+param.args[0]);
+                }
+            });  
+            
+            XposedHelpers.findAndHookMethod(LTKLog, "b",String.class,String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log2File.Log("i "+param.args[0]+" "+param.args[1]);
+                }
+            });  
+            
+            XposedHelpers.findAndHookMethod(LTKLog, "c",String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log2File.Log("w "+param.args[0]);
+                }
+            });  
+            
+            XposedHelpers.findAndHookMethod(LTKLog, "c",String.class,String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log2File.Log("w "+param.args[0]+" "+param.args[1]);
+                }
+            });  
+            
+            XposedHelpers.findAndHookMethod(LTKLog, "d",String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log2File.Log("e "+param.args[0]);
+                }
+            });  
+            
+            XposedHelpers.findAndHookMethod(LTKLog, "d",String.class,String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log2File.Log("e "+param.args[0]+" "+param.args[1]);
+                }
+            });  
+            //结束
             
             XposedHelpers.findAndHookMethod(AppInstrumentation, "callApplicationOnCreate", Application.class, new XC_MethodHook() {
                 @Override
@@ -50,6 +114,7 @@ public class Hook implements IXposedHookLoadPackage {
                     param.args[0]=true;
                 }
             });
+
             /*
             XposedHelpers.findAndHookMethod(UserInfoUtil, "q", new XC_MethodHook() {
                 @Override
@@ -291,50 +356,31 @@ public class Hook implements IXposedHookLoadPackage {
                     XposedBridge.log("FLinspirer: Login Out Password Fucked.");
                 }
              });
-             
-             //5.0.304
-             Class DynamicOrStaticPWUtil = loadPackageParam.classLoader.loadClass("com.drupe.swd.launcher.huoshan.utils.d");
-             Class LoginActivity = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.LoginActivity");
-             
-             XposedHelpers.findAndHookMethod(LoginActivity, "c", new XC_MethodHook() {
+
+             XposedHelpers.findAndHookMethod(CmdManager, "a",String.class,int.class,int.class, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    boolean s1 = (boolean) param.getResult();
-                    if(!s1){
-                    param.setResult(true);
-                    XposedBridge.log("FLinspirer: Admin Password Wrong Count Fucked.");
-                    } 
-                }
-             });
-             
-             XposedHelpers.findAndHookMethod(LoginActivity, "a",String.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    boolean s1 = (boolean) param.getResult();
-                    if(!s1){
-                    param.setResult(true);
-                    XposedBridge.log("FLinspirer: Admin Password Fucked.");
-                    } 
-                }
-             });
-             
-             XposedHelpers.findAndHookMethod(DynamicOrStaticPWUtil, "a", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    String s1 = (String) param.getResult();
-                    XposedBridge.log("FLinspirer: Admin Password "+s1);
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                String s1 = (String) param.args[0];
+                switch(s1) {
+                case "command_reset_factory":
+                    param.args[0] = "";
+                    XposedBridge.log("FLinspirer: Command Factory Reset Fucked.");
+                    break;
+                case "command_reboot_device":
+                    param.args[0] = "";
+                    XposedBridge.log("FLinspirer: Command Reboot Fucked.");
+                    break;
+                case "command_location":
+                    param.args[1] = 0;
+                    XposedBridge.log("FLinspirer: Command Report Location Fucked.");
+                    break;
+                default:
+                    XposedBridge.log("FLinspirer: Command "+s1+" "+param.args[1]+" "+param.args[2]+" was given a green light.");
+                    break;
                     }
-             });
-             
-             XposedHelpers.findAndHookMethod(DynamicOrStaticPWUtil, "c", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    String s1 = (String) param.getResult();
-                    XposedBridge.log("FLinspirer: Dynamic Password "+s1);
-                    }
-             });
-             
-             
+                }
+            });  
+            
         }
         
         if (loadPackageParam.packageName.equals("com.ndwill.swd.appstore")) {
