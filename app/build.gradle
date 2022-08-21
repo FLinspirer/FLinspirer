@@ -9,8 +9,8 @@ android {
         applicationId "com.th7.flinspirer.admin"
         minSdk 16
         targetSdk 31
-        versionCode 1
-        versionName "1.0"
+        versionCode 35
+        versionName "0.35"
     }
 
     buildTypes {
@@ -22,6 +22,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding true
     }
 }
 
