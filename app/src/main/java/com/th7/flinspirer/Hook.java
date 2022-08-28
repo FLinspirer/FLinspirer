@@ -1,4 +1,5 @@
 package com.th7.flinspirer;
+
 import android.app.Application;
 import android.content.Context;
 import android.widget.Toast;
@@ -10,27 +11,68 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import java.security.interfaces.DSAPublicKey;
+import java.util.ArrayList;
 
 public class Hook implements IXposedHookLoadPackage {
     public final Context[] context = {null,null};
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+    
     Class AppInstrumentation = XposedHelpers.findClass("android.app.Instrumentation", null);
     
         if (loadPackageParam.packageName.equals("com.android.launcher3")) {
-        String NickName="";
-            //wanpeng_5.02.004
+        
+        String NickName="FLinspirer";
+        
+            //wanpeng_5.03.012.1
             Class DSAUtil = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.util.d");
             Class PullNewsActivity = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.dataclean.PullNewsActivity");
-            Class AliPushReceiver = loadPackageParam.classLoader.loadClass("com.AliPushReceiver");
+            Class UserInfoUtil = loadPackageParam.classLoader.loadClass("com.android.launcher3.a.o");
             Class LTKTactics = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.LTKTactics");
             Class TacticsIllegal = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.TacticsIllegal");
             Class DeviceSetting = loadPackageParam.classLoader.loadClass("com.android.launcher3.model.DeviceSetting");
             Class LogOutPassword = loadPackageParam.classLoader.loadClass("com.drupe.swd.launcher.huoshan.utils.a");
             Class DataCleanActivity = loadPackageParam.classLoader.loadClass("com.innofidei.guardsecure.dataclean.DataCleanActivity");
-            Class UserInfoUtil = loadPackageParam.classLoader.loadClass("com.android.launcher3.a.l");
             Class CmdManager = loadPackageParam.classLoader.loadClass("com.drupe.swd.launcher.huoshan.mdm.tool.a");
             Class LTKLog = loadPackageParam.classLoader.loadClass("com.linspirer.utils.d.f");
+            //Class LauncherNew = loadPackageParam.classLoader.loadClass("com.android.launcher3.LauncherNew");
+            Class SystemPackageConstants = loadPackageParam.classLoader.loadClass("com.android.launcher3.etc.n");
+            
+            /*
+            XposedHelpers.findAndHookMethod(SystemPackageConstants, "a", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    ArrayList arrayList = (ArrayList) param.getResult();
+                    arrayList.add("com.innofidei.guardsecure.AdminActivity");
+                    arrayList.add("com.innofidei.guardsecure.WebSiteWhiteActivity");
+                    arrayList.add("com.innofidei.guardsecure.ProtocolActivity");
+                    arrayList.add("com.innofidei.guardsecure.RemoveControlDialogActivity");
+                    arrayList.add("com.innofidei.guardsecure.AirSharingActivity");
+                    arrayList.add("com.drupe.swd.launcher.huoshan.mdm.activity.DeviceRotatingActivity");
+                    arrayList.add("com.innofidei.guardsecure.dataclean.MemoryUseDetailedActivity");
+                    arrayList.add("com.innofidei.guardsecure.ParentalPatternActivity");
+                    param.setResult(arrayList);
+                }
+            });
+            */
+            
+            /*
+            XposedHelpers.setStaticObjectField(LauncherNew, "W", new String[]{"com.ndwill.swd.appstore", "com.innofidei.guardsecure.LoginActivity","com.innofidei.guardsecure.networktest.NetworkTestActivity", "com.linspirer.android.networktest", "com.android.launcher3.protecteye.IndexActivity", "com.iflytek.zaowanting", "com.android.settings", "com.android.calendar", "com.android.deskclock", "com.android.camera.CameraLauncher", "com.android.gallery3d.app.GalleryActivity", "hugh.android.app.zidian", "com.innofidei.guardsecure.dataclean.DataCleanActivity", "com.innofidei.guardsecure.dataclean.PullNewsActivity",
+             "com.innofidei.guardsecure.dataclean.MemoryUseDetailedActivity", "com.android.launcher3.ChangePwdActivity", "com.drupe.swd.launcher.huoshan.mdm.activity.DeviceRotatingActivity", "com.innofidei.guardsecure.AdminActivity", "com.innofidei.guardsecure.WebSiteWhiteActivity", "com.innofidei.guardsecure.PromptDialogActivity", "com.innofidei.guardsecure.RemoveControlDialogActivity"
+            });
+            */
+            
+            /*
+            //改名
+            XposedHelpers.findAndHookMethod(UserInfoUtil, "j", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(NickName);
+                    XposedBridge.log("FLinspirer: Set Student Nickname "+NickName);
+                }
+            });
+            */
             
             //log写入文件
             XposedHelpers.findAndHookMethod(LTKLog, "a",String.class, new XC_MethodHook() {
@@ -107,29 +149,6 @@ public class Hook implements IXposedHookLoadPackage {
                     Toast.makeText(context[0], "FLinspirer: Got Context "+context[0].getPackageName(), Toast.LENGTH_LONG).show();
                 }
             });
-            
-            XposedBridge.hookAllMethods(UserInfoUtil, "setFinishOnTouchOutside", new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    param.args[0]=true;
-                }
-            });
-
-            /*
-            XposedHelpers.findAndHookMethod(UserInfoUtil, "q", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    param.setResult(NickName);
-                }
-                });
-                
-            XposedHelpers.findAndHookMethod(UserInfoUtil, "g",String.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    param.args[0]=NickName;
-                }
-            });
-            */
 
             XposedBridge.hookAllMethods(android.app.AlertDialog.Builder.class, "setFinishOnTouchOutside", new XC_MethodHook() {
                 @Override
@@ -167,25 +186,6 @@ public class Hook implements IXposedHookLoadPackage {
                     XposedBridge.log("FLinspirer: Pull News Fucked.");
                 }
             });
-            
-            
-            XposedHelpers.findAndHookMethod(AliPushReceiver, "a",String.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                param.args[0] = "";
-                XposedBridge.log("FLinspirer: Ali Push Fucked.");
-                }
-            });  
-               
-            XposedHelpers.findAndHookMethod(AliPushReceiver, "a",String.class,int.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                param.args[0] = "";
-                XposedBridge.log("FLinspirer: Ali Push Fucked.");
-                }
-            });
-            
-            
             
             XposedHelpers.findAndHookMethod(LTKTactics, "isIllegal_status", new XC_MethodHook() {
                 @Override
@@ -330,7 +330,6 @@ public class Hook implements IXposedHookLoadPackage {
                 case "command_location":
                     param.args[1] = 0;
                     XposedBridge.log("FLinspirer: Command Report Location Fucked.");
-                    param.setResult(null);
                     break;
                 default:
                     XposedBridge.log("FLinspirer: Command "+s1+" "+param.args[1]+" "+param.args[2]+" was given a green light.");
@@ -342,12 +341,12 @@ public class Hook implements IXposedHookLoadPackage {
         }
         
         if (loadPackageParam.packageName.equals("com.ndwill.swd.appstore")) {
-        
-            Class AppItem = loadPackageParam.classLoader.loadClass("com.ndwill.swd.appstore.info.AppItem");
+            //5.6.005
+            Class AppItem = loadPackageParam.classLoader.loadClass("com.ndwill.swd.appstore.model.AppItem");
             Class DownloadCountUtil = loadPackageParam.classLoader.loadClass("com.ndwill.swd.appstore.a.b");
-            Class LTKApkUtil = loadPackageParam.classLoader.loadClass("com.linspirer.utils.c");
+            Class LTKApkUtil = loadPackageParam.classLoader.loadClass("com.linspirer.utils.b");
             
-        XposedHelpers.findAndHookMethod(AppInstrumentation, "callApplicationOnCreate", Application.class, new XC_MethodHook() {
+                XposedHelpers.findAndHookMethod(AppInstrumentation, "callApplicationOnCreate", Application.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
@@ -365,10 +364,10 @@ public class Hook implements IXposedHookLoadPackage {
                 }
             });
             
-            XposedHelpers.findAndHookMethod(AppItem, "isIsforce", new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(AppItem, "getIsforce", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    param.args[0] = true;
+                    param.setResult(false);
                     XposedBridge.log("FLinspirer: Get App Force Install Fucked.");
                 }
             });
@@ -381,7 +380,7 @@ public class Hook implements IXposedHookLoadPackage {
                     }
              });
              
-             XposedHelpers.findAndHookMethod(AppItem, "isCanuninstall", new XC_MethodHook() {
+             XposedHelpers.findAndHookMethod(AppItem, "getCanuninstall", new XC_MethodHook() {
                  @Override
                  protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                      param.setResult(true);
