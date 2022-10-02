@@ -9,13 +9,13 @@ android {
         applicationId "com.th7.flinspirer.admin"
         minSdk 16
         targetSdk 31
-        versionCode 40
-        versionName "0.40"
+        versionCode 50
+        versionName "0.50"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
