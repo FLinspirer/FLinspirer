@@ -20,7 +20,7 @@ jobs:
 
       - run: |
           chmod +x gradlew
-          gradlew clean app:assembleRelease
+          ./gradlew assembleRelease
 
       - uses: actions/upload-artifact@v2
         with:

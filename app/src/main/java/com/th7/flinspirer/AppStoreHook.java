@@ -75,7 +75,7 @@ public class AppStoreHook {
 
         XposedHelpers.findAndHookMethod(DownloadCountUtil, "a", int.class, Context.class, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 int s1 = (int) param.args[0];
                 String s = String.valueOf(s1);
                 param.setResult(s);

@@ -20,7 +20,6 @@ public class LinspirerHook {
             Class PullNewsActivity = classLoader.loadClass("com.innofidei.guardsecure.dataclean.PullNewsActivity");
             Class UserInfoUtil = classLoader.loadClass("com.android.launcher3.a.o");
             Class LTKTactics = classLoader.loadClass("com.android.launcher3.model.LTKTactics");
-            Class TacticsIllegal = classLoader.loadClass("com.android.launcher3.model.TacticsIllegal");
             Class DeviceSetting = classLoader.loadClass("com.android.launcher3.model.DeviceSetting");
             Class LogOutPassword = classLoader.loadClass("com.drupe.swd.launcher.huoshan.utils.a");
             Class DataCleanActivity = classLoader.loadClass("com.innofidei.guardsecure.dataclean.DataCleanActivity");
@@ -187,27 +186,16 @@ public class LinspirerHook {
             XposedHelpers.findAndHookMethod(LTKTactics, "setWorkspace_status", boolean.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    boolean s1 = (boolean) param.args[0];
-                    if (!s1) {
-                        param.args[0] = true;
-                        XposedBridge.log("FLinspirer: Set Workspace Status Fucked ");
-                    }
+                    param.args[0] = true;
+                    XposedBridge.log("FLinspirer: Set Workspace Status Fucked ");
                 }
             });
 
-            XposedHelpers.findAndHookMethod(TacticsIllegal, "getAlready_root", new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(LTKTactics, "getIllegal_tactics", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     param.setResult(null);
-                    XposedBridge.log("FLinspirer: Get Already Root Fucked.");
-                }
-            });
-
-            XposedHelpers.findAndHookMethod(TacticsIllegal, "getUsb_to_pc", new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    param.setResult(null);
-                    XposedBridge.log("FLinspirer: Get Usb to PC Fucked.");
+                    XposedBridge.log("FLinspirer: Get Illegal Tactics Fucked.");
                 }
             });
 
