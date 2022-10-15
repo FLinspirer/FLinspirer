@@ -1,0 +1,28 @@
+name: 构建Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 11
+
+      - run: |
+          chmod +x gradlew
+          gradlew clean app:assembleRelease
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Release
+          path: ./app/build/outputs/apk/release
